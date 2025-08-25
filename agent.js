@@ -35,19 +35,19 @@ const btnRegister = document.getElementById("btnRegister");
 // ====================== FUNÇÕES AUXILIARES ======================
 function avatarPorIdade(idade) {
   if (!idade) idade = 30;
-  if (idade <= 17) return "hoper_jovem.gif"; // grupo 1: 0 a 17
-  return "hoper_adulto.gif";                 // grupo 2: 18 a 100
+  if (idade <= 17) return "hoper_jovem_feliz.gif"; // grupo 1: 0 a 17
+  return "hoper_adulto_feliz.gif";                 // grupo 2: 18 a 100
 }
 function atualizarHoperPorHumor(texto, idade) {
   if (!hoperImg) return;
   const t = (texto || "").toLowerCase();
 
-if (t.match(/obrigado|ótimo|feliz|melhora|alívio|melhorei|top|boa|legal|perfeito|show|sucesso|uhul|maravilha/i)) {
-  hoperImg.src = (idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
-} else if (t.match(/dor|problema|sintoma|alerta|urgente|triste|cansado|cansada|chateado|depressivo|mal|doente|preocupado/i)) {
-  hoperImg.src = (idade <= 17) ? "hoper_jovem_preocupado.gif" : "hoper_adulto_preocupado.gif";
-} else {
-  hoperImg.src = (idade <= 17) ? "hoper_jovem_neutro.gif" : "hoper_adulto_neutro.gif";
+  if (t.match(/obrigado|ótimo|feliz|melhora|alívio/i)) hoperImg.src = (idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+  else if (t.match(/dor|problema|sintoma|alerta|urgente/i)) {
+    hoperImg.src = (idade <= 17) ? "hoper_jovem_preocupado.gif" : "hoper_adulto_preocupado.gif";
+  } else {
+    hoperImg.src = (idade <= 17) ? "hoper_jovem_neutro.gif" : "hoper_adulto_feliz.gif";
+  }
 }
 
 function setHeader(user) {
