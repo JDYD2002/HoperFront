@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hoper Saúde</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+  <!-- Seção de Autenticação -->
+  <section id="authSection">
+    <h1 class="title">🩺 Hoper Saúde</h1>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-target="loginCard">Login</button>
+      <button class="tab-btn" data-target="registerCard">Registro</button>
+    </div>
+
+    <!-- Card Login -->
+    <div id="loginCard" class="card form-box">
+      <label>Email</label>
+      <input id="loginEmail" type="email" placeholder="seu@email.com" />
+      <label>Senha</label>
+      <input id="loginSenha" type="password" placeholder="••••••••" />
+      <button id="btnLogin" class="btn primary">Entrar</button>
+      <p class="hint">Use seu email e senha cadastrados.</p>
+    </div>
+
+    <!-- Card Registro -->
+    <div id="registerCard" class="card form-box hidden">
+      <div class="grid-2">
+        <div>
+          <label>Nome</label>
+          <input id="regNome" type="text" placeholder="Seu nome" />
+        </div>
+        <div>
+          <label>Idade</label>
+          <input id="regIdade" type="number" min="0" max="120" placeholder="18" />
+        </div>
+      </div>
+      <label>Email</label>
+      <input id="regEmail" type="email" placeholder="seu@email.com" />
+      <label>CEP</label>
+      <input id="regCep" type="text" placeholder="Seu CEP" />
+      <label>Senha</label>
+      <input id="regSenha" type="password" placeholder="Defina uma senha" />
+      <button id="btnRegister" class="btn success">Registrar</button>
+    </div>
+  </section>
+
+
+    <!-- Seção do Agente -->
+    <section id="agentSection" class="card hidden">
+      <div class="agent-layout">
+        <!-- Painel do Hoper -->
+        <aside class="hoper-pane">
+          <img id="hoperImg" src="hoperC.gif" alt="Hoper" />
+          <p class="hoper-caption">Hoper, seu assistente de saúde</p>
+        </aside>
+
+        <!-- Painel do Chat -->
+        <main class="chat-pane">
+          <header class="agent-header">
+            <div>
+              <h2 id="welcome" class="agent-title"></h2>
+              <div id="userBadge" class="badge"></div>
+            </div>
+            <div class="actions">
+             <button id="btnSintoma" class="action-btn">🩺 Sintoma comum</button>
+             <button id="btnDica" class="action-btn">💊 Dica de prevenção</button>
+             <button id="btnPostos" class="action-btn">🏥 Postos Próximos</button>
+
+
+              <button id="btnLogout" class="btn danger">Sair</button>
+            </div>
+          </header>
+
+          <div id="chatBox" class="chat"></div>
+
+          <div class="composer">
+            <input id="msgInput" type="text" placeholder="Digite sua mensagem..." />
+            <button id="btnEnviar" class="btn primary">Enviar</button>
+          </div>
+        </main>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="agent.js"></script>
+</body>
+</html>

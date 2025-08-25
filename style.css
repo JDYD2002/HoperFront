@@ -1,0 +1,344 @@
+:root{
+  --bg: #0f1115;
+  --card: #171a21;
+  --text: #e8eef8;
+  --muted: #9fb0ca;
+  --primary: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --ghost: #2a2f3a;
+  --border: #232838;
+  --chat-user: #1e293b;
+  --chat-bot: #162033;
+
+  /* Ajuste rápido: controla o quanto o card de auth fica abaixo do topo */
+  --auth-top: 10px; /* reduzir para subir o card (ex.: 20px, 0px) */
+}
+
+/* Container da mensagem */
+.msg {
+  display: flex;
+  margin: 5px 0;
+}
+
+/* Mensagem do usuário: direita */
+.msg.user {
+  justify-content: flex-end; /* empurra para direita */
+}
+
+.msg.user .bubble {
+  background-color: #4caf50; /* verde, por exemplo */
+  color: white;
+  border-radius: 15px 15px 0 15px; /* bolha arredondada */
+  padding: 8px 12px;
+  max-width: 70%;
+}
+
+/* Mensagem do Hoper: esquerda */
+.msg.bot {
+  justify-content: flex-start; /* empurra para esquerda */
+  color: white;
+}
+
+.msg.bot .bubble {
+  background-color: #e0e0e0; /* cinza claro */
+  color: black;
+  border-radius: 15px 15px 15px 0;
+  padding: 8px 12px;
+  max-width: 70%;
+}
+
+/* Quem enviou a mensagem */
+.msg .who {
+  font-size: 0.75rem;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+body{
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg);
+  color: var(--text);
+    overflow: hidden;
+}
+
+/* layout principal */
+.wrap{
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* estilo base do card */
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+}
+
+/* LOGIN / REGISTER cards */
+#loginCard {
+  width: 100%;
+  max-width: 450px;
+  height: 340px;
+  margin: var(--auth-top) auto 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+#btnLogin {
+  padding: 3px 10px; /* menor altura e largura interna */
+  font-size: 0.95rem;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+#registerCard {
+  width: 100%;
+  max-width: 450px; /* coloquei igual ao login para proporcionalidade */
+  height: 420px;
+  margin: var(--auth-top) auto 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* título */
+.title{
+  margin: 0 0 14px;
+  font-size: 1.6rem;
+  letter-spacing: 0.3px;
+}
+
+/* --- TABS (corrigidas e proporcionais ao card) --- */
+/* Faz as tabs alinharem à mesma largura do card e centraliza */
+.tabs{
+  display: flex;
+  gap: 8px;
+  margin: 0 auto 5px auto;
+  width: 100%;
+  max-width: 450px; /* mesma largura do card */
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* cada botão ocupa a mesma fração do espaço */
+.tab-btn{
+  flex: 1;
+  min-width: 0;            /* evita overflow em textos longos */
+  padding: 8px 10px;       /* reduz o tamanho vertical/horizontal */
+  font-size: 0.95rem;      /* ligeiramente menor */
+  border-radius: 8px;      /* cantos um pouco menores */
+  text-align: center;
+  box-sizing: border-box;
+
+  background: var(--ghost);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+/* estado ativo */
+.tab-btn.active{
+  background: var(--primary);
+  color: white;
+  border-color: transparent;
+}
+
+/* Formulário e inputs */
+.form-box{ display: grid; gap: 10px; }
+.hidden{ display: none !important; }
+
+label{ font-size: 0.9rem; color: var(--muted); }
+input{
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0d1118;
+  color: var(--text);
+  outline: none;
+}
+input:focus{ border-color: #3b82f6aa; box-shadow: 0 0 0 3px #3b82f622; }
+.grid-2{ display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+
+/* Caixa login */
+#loginCard input {
+  padding: 0px 10px;  /* altura menor só para login */
+  font-size: 0.9rem;
+  border-radius: 8px;
+}
+
+
+/* botões */
+.btn{
+  border: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform .05s ease, filter .15s ease;
+  font-weight: 600;
+}
+.btn:active{ transform: translateY(1px); }
+.btn.primary{ background: var(--primary); color:#fff; }
+.btn.success{ background: var(--success); color:#07130e; }
+.btn.danger{ background: var(--danger); color:#fff; }
+.btn.ghost{ background: var(--ghost); color: var(--text); border: 1px solid var(--border); }
+
+.action-btn {
+  background-color: #2a2f3a; /* cinza escuro */
+  color: var(--text);
+  border: 1px solid #232838; /* mesma linha dos outros */
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: #3b424e; /* cinza mais claro ao passar o mouse */
+  transform: translateY(-3px); /* leve "pulinho" */
+}
+
+.action-btn:active {
+  transform: translateY(1px); /* efeito ao clicar */
+  background-color: #2f353f; /* escurece um pouco ao clicar */
+}
+
+.hint{
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+/* agente/chat */
+.agent-header{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.agent-title{ margin: 0 0 4px; }
+.badge{
+  font-size: .85rem;
+  color: var(--muted);
+}
+
+.actions{ display: flex; gap: 8px; }
+
+.chat{
+  margin-top: 12px;
+  height: 430px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: #0b111a;
+}
+
+.agent-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.hoper-pane {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+}
+.hoper-pane img {
+  width: 150%;
+  max-width: 350px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.hoper-caption {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  background: linear-gradient(90deg, #4e54c8, #8f94fb); /* degrade roxo-azul */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.chat-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.msg{
+  display: flex; gap: 10px; margin-bottom: 12px;
+}
+.msg .who{
+  font-size: .8rem; color: var(--muted); min-width: 64px; text-align: right; opacity: 0.9;
+}
+.msg .bubble{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  max-width: 95%;
+  line-height: 1.35rem;
+}
+.msg.user .bubble{ background: var(--chat-user); }
+.msg.bot .bubble{ background: var(--chat-bot); }
+
+.composer{
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+#authSection .title {
+  width: 100%;
+  max-width: 450px;       /* mesma largura do card (ajuste se trocou) */
+  margin: 14px;    /* centraliza a caixa do título com o card */
+  text-align: right;      /* alinha o texto à direita dessa caixa */
+  padding-right: 12px;    /* espaço entre texto e borda direita */
+  box-sizing: border-box;
+
+/* --- Ajustes responsivos e dicas rápidas --- */
+@media (max-width: 520px) {
+  #loginCard,
+  #registerCard {
+    margin: 20px auto 0 auto;
+    height: auto;
+  }
+  .tabs {
+    max-width: 92%;
+    gap: 6px;
+  }
+  .tab-btn {
+    padding: 7px 8px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Se quiser subir o card mais ainda, reduza a variável --auth-top no :root acima.
+   Ex.: --auth-top: 20px; ou --auth-top: 0px; */
