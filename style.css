@@ -42,7 +42,7 @@
 
 .msg.bot .bubble {
   background-color: #e0e0e0; /* cinza claro */
-  color: black;
+  color: white;
   border-radius: 15px 15px 15px 0;
   padding: 8px 12px;
   max-width: 70%;
