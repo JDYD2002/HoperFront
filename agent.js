@@ -35,18 +35,21 @@ const btnRegister = document.getElementById("btnRegister");
 // ====================== FUNÇÕES AUXILIARES ======================
 function avatarPorIdade(idade) {
   if (!idade) idade = 30;
-  if (idade <= 17) return "hoper_jovem_feliz.gif"; // grupo 1: 0 a 17
-  return "hoper_adulto_feliz.gif";                 // grupo 2: 18 a 100
+  if (idade <= 17) return "hoper_jovem_feliz.gif"; 
+  return "hoper_adulto_feliz.gif";                 
 }
+
 function atualizarHoperPorHumor(texto, idade) {
   if (!hoperImg) return;
   const t = (texto || "").toLowerCase();
 
-  if (t.match(/obrigado|ótimo|feliz|melhora|alívio/i)) hoperImg.src = (idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
-  else if (t.match(/dor|problema|sintoma|alerta|urgente/i)) {
+  if (t.match(/obrigado|ótimo|feliz|melhora|alívio/i)) {
+    hoperImg.src = (idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+  } else if (t.match(/dor|problema|sintoma|alerta|urgente/i)) {
     hoperImg.src = (idade <= 17) ? "hoper_jovem_preocupado.gif" : "hoper_adulto_preocupado.gif";
   } else {
-    hoperImg.src = (idade <= 17) ? "hoper_jovem_neutro.gif" : "hoper_adulto_feliz.gif";
+    // Sempre feliz quando não há texto ou humor indefinido
+    hoperImg.src = (idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
   }
 }
 
@@ -157,6 +160,10 @@ btnLogin.addEventListener("click", async () => {
     setHeader(userData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Bem-vindo de volta, ${userData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
+
+    // Hoper sempre inicia feliz
+    hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+
     showAgent();
   } catch(e) { alert(e.message || "Erro ao logar"); }
 });
@@ -222,7 +229,6 @@ const atalhos = [
   { btn: btnSintoma, msg: "Me dê um sintoma comum para análise." },
   { btn: btnDica, msg: "Me dê uma dica de prevenção contra doenças comuns." }
 ];
-
 atalhos.forEach(a => a.btn.addEventListener("click", () => enviar(a.msg)));
 
 // ====================== BOOT / SESSÃO ======================
@@ -233,7 +239,10 @@ auth.onAuthStateChanged(async (user)=>{
     setHeader(userData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Olá, ${userData.nome?.split(" ")[0] || user.email}! Retomando nosso atendimento.`);
-    atualizarHoperPorHumor("", userData.idade);
+
+    // Hoper sempre inicia feliz ao retomar sessão
+    hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+
     showAgent();
   }
 });
