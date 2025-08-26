@@ -232,21 +232,19 @@ const atalhos = [
 atalhos.forEach(a => a.btn.addEventListener("click", () => enviar(a.msg)));
 
 // ====================== BOOT / SESSÃO ======================
-auth.onAuthStateChanged(async (user)=>{
-  if(user){
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
     const docSnap = await getDoc(doc(db, "users", user.uid));
-    const userData = docSnap.exists() ? docSnap.data() : { email:user.email };
+    const userData = docSnap.exists() ? docSnap.data() : { email: user.email };
     setHeader(userData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Olá, ${userData.nome?.split(" ")[0] || user.email}! Retomando nosso atendimento.`);
 
-    hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+    hoperImg.src = (userData.idade <= 17) 
+      ? "hoper_jovem_feliz.gif" 
+      : "hoper_adulto_feliz.gif";
 
     showAgent();
 
-    // 🔹 Buscar postos automaticamente ao recarregar
-    await mostrarPostos(user.uid);
   }
 });
-
-
