@@ -240,10 +240,13 @@ auth.onAuthStateChanged(async (user)=>{
     chatBox.innerHTML = "";
     addMsg("Hoper", `Olá, ${userData.nome?.split(" ")[0] || user.email}! Retomando nosso atendimento.`);
 
-    // Hoper sempre inicia feliz ao retomar sessão
     hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
 
     showAgent();
+
+    // 🔹 Buscar postos automaticamente ao recarregar
+    await mostrarPostos(user.uid);
   }
 });
+
 
