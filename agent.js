@@ -4,6 +4,9 @@ import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/
 
 const BASE_URL = "https://hoperbackk.onrender.com"; // ou sua URL de deploy
 
+// ====================== VARIÁVEIS ======================
+let currentUserId = null; // 🔹 guarda o user_id correto do backend
+
 // ====================== DOM ======================
 const authSection  = document.getElementById("authSection");
 const agentSection = document.getElementById("agentSection");
@@ -104,10 +107,9 @@ async function mostrarPostos(user_id) {
 }
 
 btnPostos.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) { alert("Faça login primeiro."); return; }
+  if (!currentUserId) { alert("Faça login primeiro."); return; }
   addMsg("Você", "🏥 Procurar postos próximos…");
-  await mostrarPostos(user.uid);
+  await mostrarPostos(currentUserId);
 });
 
 // ====================== REGISTRO ======================
@@ -130,6 +132,7 @@ btnRegister.addEventListener("click", async () => {
       body: JSON.stringify({ nome, email, idade, cep, uid: user.uid })
     });
     const data = await res.json();
+    currentUserId = data.user_id; // 🔹 salva o user_id do backend
 
     setHeader({ nome, email, cep, idade });
     chatBox.innerHTML = "";
@@ -155,6 +158,7 @@ btnLogin.addEventListener("click", async () => {
       body: JSON.stringify({ uid: user.uid })
     });
     const data = await res.json();
+    currentUserId = data.user_id; // 🔹 atualiza user_id do backend
 
     const safeData = {
       nome: data.nome || user.email,
@@ -176,6 +180,7 @@ btnLogin.addEventListener("click", async () => {
 btnLogout.addEventListener("click", async () => {
   try {
     await signOut(auth);
+    currentUserId = null; // 🔹 reseta user_id
 
     chatBox.innerHTML = "";
     msgInput.value = "";
@@ -197,11 +202,7 @@ btnLogout.addEventListener("click", async () => {
 
 // ====================== ENVIO DE MENSAGENS ======================
 async function enviar(texto){
-  const user = auth.currentUser;
-  if(!user){ alert("Faça login primeiro."); showAuth(); return; }
-
-  const docSnap = await getDoc(doc(db, "users", user.uid));
-  const userData = docSnap.exists() ? docSnap.data() : { email:user.email, nome:user.email, idade:30, cep:"" };
+  if(!currentUserId){ alert("Faça login primeiro."); showAuth(); return; }
 
   addMsg("Você", texto);
 
@@ -215,13 +216,13 @@ async function enviar(texto){
     const res = await fetch(`${BASE_URL}/chat`, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ user_id:user.uid, texto })
+      body: JSON.stringify({ user_id: currentUserId, texto })
     });
     const data = await res.json();
     chatBox.removeChild(digitando);
 
     addMsg("Hoper", data.resposta || "Não consegui responder.");
-    atualizarHoperPorHumor(data.resposta, userData.idade);
+    atualizarHoperPorHumor(data.resposta, data.idade || 30);
 
     if(data.postos && data.postos.length > 0){
       const linhas = data.postos.map(p => `• ${p.nome} — ${p.endereco || "Endereço não informado"}`).join("\n");
@@ -254,13 +255,23 @@ atalhos.forEach(a => a.btn.addEventListener("click", () => enviar(a.msg)));
 // ====================== BOOT / SESSÃO ======================
 auth.onAuthStateChanged(async (user) => {
   if (user) {
-    const docSnap = await getDoc(doc(db, "users", user.uid));
-    const userData = docSnap.exists() ? docSnap.data() : { email:user.email, nome:user.email, idade:30, cep:"" };
-    setHeader(userData);
-    chatBox.innerHTML = "";
-    addMsg("Hoper", `Olá, ${userData.nome.split(" ")[0]}! Retomando nosso atendimento.`);
+    try {
+      const res = await fetch(`${BASE_URL}/login`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ uid: user.uid })
+      });
+      const data = await res.json();
+      currentUserId = data.user_id;
 
-    hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
-    showAgent();
+      setHeader(data);
+      chatBox.innerHTML = "";
+      addMsg("Hoper", `Olá, ${data.nome.split(" ")[0]}! Retomando nosso atendimento.`);
+      hoperImg.src = (data.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+      showAgent();
+    } catch (e) {
+      console.error("Erro ao restaurar sessão:", e);
+      showAuth();
+    }
   }
 });
