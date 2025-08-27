@@ -120,26 +120,27 @@ btnRegister.addEventListener("click", async () => {
   const senha = regSenha.value.trim();
 
   if (!nome || !email || !cep || !idade || !senha) { alert("Preencha todos os campos."); return; }
-  if (!validarNome(nome)) { alert("Nome inválido."); return; }
-  if (!validarIdade(idade)) { alert("Idade inválida."); return; }
-  if (!validarCEP(cep)) { alert("CEP inválido."); return; }
 
   try {
+    // Cria usuário no Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    await setDoc(doc(db, "users", user.uid), { nome, idade, cep, email });
-
-    await fetch(`${BASE_URL}/register`, {
+    // Envia dados para backend
+    const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, email, idade, cep, uid: user.uid })
+      body: JSON.stringify({
+        nome, email, idade, cep, uid: user.uid
+      })
     });
+    const data = await res.json();
 
     setHeader({ nome, email, cep, idade });
     chatBox.innerHTML = "";
     addMsg("Hoper", `Olá, ${nome.split(" ")[0]}! Estou aqui para ajudar. 👩‍⚕️`);
     showAgent();
+
   } catch(e) { alert(e.message || "Erro ao registrar"); }
 });
 
@@ -150,29 +151,25 @@ btnLogin.addEventListener("click", async () => {
   if (!email || !senha) { alert("Informe email e senha."); return; }
 
   try {
+    // Login no Firebase Auth
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    const docSnap = await getDoc(doc(db, "users", user.uid));
-    if (!docSnap.exists()) throw new Error("Usuário não encontrado");
-    const userData = docSnap.data();
+    // Chama backend passando UID
+    const res = await fetch(`${BASE_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid: user.uid })
+    });
+    const data = await res.json();
 
-    setHeader(userData);
+    setHeader(data);
     chatBox.innerHTML = "";
-    addMsg("Hoper", `Bem-vindo de volta, ${userData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
-
-    // Hoper sempre inicia feliz
-    hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
-
+    addMsg("Hoper", `Bem-vindo de volta, ${data.nome.split(" ")[0]}! Como posso ajudar hoje?`);
+    hoperImg.src = (data.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
     showAgent();
-  } catch(e) { alert(e.message || "Erro ao logar"); }
-});
 
-// ====================== LOGOUT ======================
-btnLogout.addEventListener("click", async () => {
-  await signOut(auth);
-  showAuth();
-  chatBox.innerHTML = "";
+  } catch(e) { alert(e.message || "Erro ao logar"); }
 });
 
 // ====================== ENVIO DE MENSAGENS ======================
@@ -248,3 +245,4 @@ auth.onAuthStateChanged(async (user) => {
 
   }
 });
+
