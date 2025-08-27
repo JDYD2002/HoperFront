@@ -323,22 +323,82 @@ input:focus{ border-color: #3b82f6aa; box-shadow: 0 0 0 3px #3b82f622; }
   padding-right: 12px;    /* espaço entre texto e borda direita */
   box-sizing: border-box;
 
-/* --- Ajustes responsivos e dicas rápidas --- */
-@media (max-width: 520px) {
-  #loginCard,
-  #registerCard {
-    margin: 20px auto 0 auto;
-    height: auto;
+/* --- Ajustes responsivos globais --- */
+@media (max-width: 900px) {
+  .agent-layout {
+    grid-template-columns: 1fr;  /* vira 1 coluna */
+    gap: 12px;
   }
-  .tabs {
-    max-width: 92%;
-    gap: 6px;
+
+  .hoper-pane {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
-  .tab-btn {
-    padding: 7px 8px;
-    font-size: 0.9rem;
+
+  .hoper-pane img {
+    width: 100%;
+    max-width: 260px; /* reduz imagem */
+  }
+
+  .chat {
+    height: 360px; /* menor altura em telas menores */
   }
 }
 
-/* Se quiser subir o card mais ainda, reduza a variável --auth-top no :root acima.
-   Ex.: --auth-top: 20px; ou --auth-top: 0px; */
+/* Tablets e celulares */
+@media (max-width: 600px) {
+  body {
+    padding: 0 10px;
+    overflow-y: auto; /* permite rolagem */
+  }
+
+  #loginCard,
+  #registerCard {
+    width: 100%;
+    max-width: 100%;   /* ocupa toda largura */
+    margin: 10px auto;
+    height: auto;      /* altura flexível */
+    padding: 12px;
+  }
+
+  .tabs {
+    max-width: 100%;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    padding: 6px;
+    font-size: 0.85rem;
+  }
+
+  .chat {
+    height: 280px; /* ainda menor em celulares */
+  }
+
+  .msg .bubble {
+    max-width: 85%; /* evita bolha gigante em celular */
+  }
+}
+
+/* Celulares bem pequenos (<= 400px) */
+@media (max-width: 400px) {
+  .title {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  input {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .composer {
+    grid-template-columns: 1fr; /* input e botão ficam um abaixo do outro */
+  }
+}
