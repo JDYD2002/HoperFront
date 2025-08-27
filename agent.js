@@ -48,16 +48,15 @@ function atualizarHoperPorHumor(texto, idade) {
   } else if (t.match(/dor|problema|sintoma|alerta|urgente/i)) {
     hoperImg.src = (idade <= 17) ? "hoper_jovem_preocupado.gif" : "hoper_adulto_preocupado.gif";
   } else {
-    // Sempre feliz quando não há texto ou humor indefinido
     hoperImg.src = (idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
   }
 }
 
 function setHeader(user) {
-  const primeiroNome = (user.nome || user.email).split(" ")[0];
+  const primeiroNome = ((user?.nome) || (user?.email) || "Usuário").split(" ")[0];
   welcome.textContent = `Bem-vindo(a), ${primeiroNome}`;
-  userBadge.textContent = `${user.cep || ""} • ${user.idade || ""} anos`;
-  if (hoperImg) hoperImg.src = avatarPorIdade(user.idade);
+  userBadge.textContent = `${user?.cep || ""} • ${user?.idade || ""} anos`;
+  if (hoperImg) hoperImg.src = avatarPorIdade(user?.idade);
 }
 
 function addMsg(who, text) {
@@ -122,17 +121,13 @@ btnRegister.addEventListener("click", async () => {
   if (!nome || !email || !cep || !idade || !senha) { alert("Preencha todos os campos."); return; }
 
   try {
-    // Cria usuário no Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // Envia dados para backend
     const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nome, email, idade, cep, uid: user.uid
-      })
+      body: JSON.stringify({ nome, email, idade, cep, uid: user.uid })
     });
     const data = await res.json();
 
@@ -151,11 +146,9 @@ btnLogin.addEventListener("click", async () => {
   if (!email || !senha) { alert("Informe email e senha."); return; }
 
   try {
-    // Login no Firebase Auth
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // Chama backend passando UID
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -163,10 +156,17 @@ btnLogin.addEventListener("click", async () => {
     });
     const data = await res.json();
 
-    setHeader(data);
+    const safeData = {
+      nome: data.nome || user.email,
+      idade: data.idade || 30,
+      cep: data.cep || "",
+      email: data.email || user.email
+    };
+
+    setHeader(safeData);
     chatBox.innerHTML = "";
-    addMsg("Hoper", `Bem-vindo de volta, ${data.nome.split(" ")[0]}! Como posso ajudar hoje?`);
-    hoperImg.src = (data.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+    addMsg("Hoper", `Bem-vindo de volta, ${safeData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
+    hoperImg.src = (safeData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
     showAgent();
 
   } catch(e) { alert(e.message || "Erro ao logar"); }
@@ -175,23 +175,18 @@ btnLogin.addEventListener("click", async () => {
 // ====================== LOGOUT ======================
 btnLogout.addEventListener("click", async () => {
   try {
-    // Encerra a sessão do Firebase
     await signOut(auth);
 
-    // Limpa chat e inputs
     chatBox.innerHTML = "";
     msgInput.value = "";
     loginEmail.value = "";
     loginSenha.value = "";
 
-    // Reseta avatar e header
-    hoperImg.src = "hoper_jovem_feliz.gif"; // ou adulto, se quiser padrão
+    hoperImg.src = "hoper_jovem_feliz.gif";
     welcome.textContent = "";
     userBadge.textContent = "";
 
-    // Volta para tela de login
     showAuth();
-
     addMsg("Hoper", "Você saiu da conta. Até logo! 👋");
 
   } catch (e) {
@@ -206,7 +201,7 @@ async function enviar(texto){
   if(!user){ alert("Faça login primeiro."); showAuth(); return; }
 
   const docSnap = await getDoc(doc(db, "users", user.uid));
-  const userData = docSnap.exists() ? docSnap.data() : { email:user.email };
+  const userData = docSnap.exists() ? docSnap.data() : { email:user.email, nome:user.email, idade:30, cep:"" };
 
   addMsg("Você", texto);
 
@@ -260,18 +255,12 @@ atalhos.forEach(a => a.btn.addEventListener("click", () => enviar(a.msg)));
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     const docSnap = await getDoc(doc(db, "users", user.uid));
-    const userData = docSnap.exists() ? docSnap.data() : { email: user.email };
+    const userData = docSnap.exists() ? docSnap.data() : { email:user.email, nome:user.email, idade:30, cep:"" };
     setHeader(userData);
     chatBox.innerHTML = "";
-    addMsg("Hoper", `Olá, ${userData.nome?.split(" ")[0] || user.email}! Retomando nosso atendimento.`);
+    addMsg("Hoper", `Olá, ${userData.nome.split(" ")[0]}! Retomando nosso atendimento.`);
 
-    hoperImg.src = (userData.idade <= 17) 
-      ? "hoper_jovem_feliz.gif" 
-      : "hoper_adulto_feliz.gif";
-
+    hoperImg.src = (userData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
     showAgent();
-
   }
 });
-
-
