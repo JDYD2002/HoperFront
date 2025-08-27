@@ -172,8 +172,13 @@ btnLogin.addEventListener("click", async () => {
     setHeader(safeData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Bem-vindo de volta, ${safeData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
-    hoperImg.src = (safeData.idade <= 17) ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+    hoperImg.src = avatarPorIdade(safeData.idade);
+
+    // 🔹 Garantir que a seção do agente seja exibida
     showAgent();
+
+    // 🔹 Atualiza currentUserId para os botões e envio de mensagens
+    msgInput.dataset.userId = currentUserId;
 
   } catch(e) { alert(e.message || "Erro ao logar"); }
 });
@@ -278,3 +283,4 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
+
