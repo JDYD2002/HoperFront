@@ -172,6 +172,34 @@ btnLogin.addEventListener("click", async () => {
   } catch(e) { alert(e.message || "Erro ao logar"); }
 });
 
+// ====================== LOGOUT ======================
+btnLogout.addEventListener("click", async () => {
+  try {
+    // Encerra a sessão do Firebase
+    await signOut(auth);
+
+    // Limpa chat e inputs
+    chatBox.innerHTML = "";
+    msgInput.value = "";
+    loginEmail.value = "";
+    loginSenha.value = "";
+
+    // Reseta avatar e header
+    hoperImg.src = "hoper_jovem_feliz.gif"; // ou adulto, se quiser padrão
+    welcome.textContent = "";
+    userBadge.textContent = "";
+
+    // Volta para tela de login
+    showAuth();
+
+    addMsg("Hoper", "Você saiu da conta. Até logo! 👋");
+
+  } catch (e) {
+    console.error("Erro ao sair:", e);
+    alert("Não foi possível sair da conta.");
+  }
+});
+
 // ====================== ENVIO DE MENSAGENS ======================
 async function enviar(texto){
   const user = auth.currentUser;
@@ -245,4 +273,5 @@ auth.onAuthStateChanged(async (user) => {
 
   }
 });
+
 
