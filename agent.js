@@ -126,13 +126,14 @@ btnRegister.addEventListener("click", async () => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
+    // 🔹 registra no backend e pega o user_id correto
     const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, email, idade, cep, uid: user.uid })
     });
     const data = await res.json();
-    currentUserId = data.user_id; // 🔹 salva o user_id do backend
+    currentUserId = data.user_id;
 
     setHeader({ nome, email, cep, idade });
     chatBox.innerHTML = "";
@@ -152,13 +153,14 @@ btnLogin.addEventListener("click", async () => {
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
+    // 🔹 busca dados corretos do backend
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ uid: user.uid })
     });
     const data = await res.json();
-    currentUserId = data.user_id; // 🔹 atualiza user_id do backend
+    currentUserId = data.user_id;
 
     const safeData = {
       nome: data.nome || user.email,
@@ -256,6 +258,7 @@ atalhos.forEach(a => a.btn.addEventListener("click", () => enviar(a.msg)));
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     try {
+      // 🔹 restaura sessão com dados corretos do backend
       const res = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
