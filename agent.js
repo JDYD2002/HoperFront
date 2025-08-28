@@ -180,26 +180,35 @@ btnRegister.addEventListener("click", async () => {
 });
 
 // ====================== LOGIN ======================
+// ====================== LOGIN ======================
 btnLogin.addEventListener("click", async () => {
   const email = loginEmail.value.trim();
   const senha = loginSenha.value.trim();
 
-  if (!email || !senha) {
+  if (!email && !senha) {
     alert("Informe email e senha.");
     return;
   }
 
   try {
+    // 🔹 Login no Firebase
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
+    // 🔹 Prepara dados para enviar ao backend
+    const payload = {};
+    if (user?.uid) payload.uid = user.uid;         // prioridade UID
+    else if (email) payload.email = email;        // fallback email
+
+    // 🔹 Busca dados corretos do backend via UID ou email
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: user.uid })
+      body: JSON.stringify(payload)
     });
 
     if (!res.ok) throw new Error("Usuário não encontrado no backend.");
+
     const data = await res.json();
     currentUserId = data.user_id;
 
@@ -213,12 +222,13 @@ btnLogin.addEventListener("click", async () => {
     setHeader(safeData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Bem-vindo de volta, ${safeData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
-    atualizarHoperPorHumor(""); // 🔹 usa idade correta
+    hoperImg.src = safeData.idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
     showAgent();
   } catch (e) {
     alert(e.message || "Erro ao logar");
   }
 });
+
 
 // ====================== LOGOUT ======================
 btnLogout.addEventListener("click", async () => {
@@ -323,3 +333,4 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
+
