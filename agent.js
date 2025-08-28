@@ -9,7 +9,8 @@ import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/
 const BASE_URL = "https://hoperbackk.onrender.com"; // ou sua URL de deploy
 
 // ====================== VARIÁVEIS ======================
-let currentUserId = null; // 🔹 guarda o user_id correto do backend
+let currentUserId = null;
+let currentUserData = null; // 🔹 mantém dados do usuário localmente
 
 // ====================== DOM ======================
 const authSection = document.getElementById("authSection");
@@ -44,19 +45,21 @@ function avatarPorIdade(idade) {
   return idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
 }
 
-function atualizarHoperPorHumor(texto, idade) {
-  if (!hoperImg) return;
+function atualizarHoperPorHumor(texto) {
+  if (!hoperImg || !currentUserData) return;
+  const idade = currentUserData.idade || 30;
   const t = (texto || "").toLowerCase();
   if (t.match(/obrigado|ótimo|feliz|melhora|alívio/i)) {
     hoperImg.src = idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
   } else if (t.match(/dor|problema|sintoma|alerta|urgente/i)) {
     hoperImg.src = idade <= 17 ? "hoper_jovem_preocupado.gif" : "hoper_adulto_preocupado.gif";
   } else {
-    hoperImg.src = idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+    hoperImg.src = avatarPorIdade(idade);
   }
 }
 
 function setHeader(user) {
+  currentUserData = user;
   const primeiroNome = (user?.nome || user?.email || "Usuário").split(" ")[0];
   welcome.textContent = `Bem-vindo(a), ${primeiroNome}`;
   userBadge.textContent = `${user?.cep || ""} • ${user?.idade || ""} anos`;
@@ -74,7 +77,6 @@ function addMsg(who, text) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Mostrar/ocultar telas
 function showAuth() {
   authSection.classList.remove("hidden");
   agentSection.classList.add("hidden");
@@ -149,11 +151,9 @@ btnRegister.addEventListener("click", async () => {
   }
 
   try {
-    // 🔹 Cria usuário no Firebase
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // 🔹 Envia dados corretos pro backend (Cadastro)
     const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -162,14 +162,13 @@ btnRegister.addEventListener("click", async () => {
         email, 
         cep, 
         idade, 
-        uid: user.uid // 🔹 UID do Firebase
+        uid: user.uid
       })
     });
 
     if (!res.ok) throw new Error("Falha ao registrar no backend.");
-
     const data = await res.json();
-    currentUserId = data.user_id; // 🔹 Salva user_id correto
+    currentUserId = data.user_id;
 
     setHeader({ nome, email, cep, idade });
     chatBox.innerHTML = "";
@@ -191,19 +190,16 @@ btnLogin.addEventListener("click", async () => {
   }
 
   try {
-    // 🔹 Login no Firebase
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // 🔹 Busca dados corretos do backend via UID
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: user.uid }) // 🔹 Envia apenas uid
+      body: JSON.stringify({ uid: user.uid })
     });
 
     if (!res.ok) throw new Error("Usuário não encontrado no backend.");
-
     const data = await res.json();
     currentUserId = data.user_id;
 
@@ -217,19 +213,19 @@ btnLogin.addEventListener("click", async () => {
     setHeader(safeData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Bem-vindo de volta, ${safeData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
-    hoperImg.src = safeData.idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+    atualizarHoperPorHumor(""); // 🔹 usa idade correta
     showAgent();
   } catch (e) {
     alert(e.message || "Erro ao logar");
   }
 });
 
-
 // ====================== LOGOUT ======================
 btnLogout.addEventListener("click", async () => {
   try {
     await signOut(auth);
-    currentUserId = null; // 🔹 reseta user_id
+    currentUserId = null;
+    currentUserData = null;
     chatBox.innerHTML = "";
     msgInput.value = "";
     loginEmail.value = "";
@@ -274,19 +270,13 @@ async function enviar(texto) {
     const data = await res.json();
     chatBox.removeChild(digitando);
     addMsg("Hoper", data.resposta || "Não consegui responder.");
-    atualizarHoperPorHumor(data.resposta, data.idade || 30);
-
-    if (data.postos && data.postos.length > 0) {
-      const linhas = data.postos.map(p => `• ${p.nome} — ${p.endereco || "Endereço não informado"}`).join("\n");
-      addMsg("Hoper", `Unidades próximas:\n${linhas}`);
-    }
+    atualizarHoperPorHumor(data.resposta);
   } catch (e) {
     chatBox.removeChild(digitando);
     addMsg("Hoper", "Erro ao conectar ao servidor.");
   }
 }
 
-// Centralizar envio (botão + Enter)
 function enviarMsgInput() {
   const t = msgInput.value.trim();
   if (!t) return;
@@ -314,7 +304,6 @@ atalhos.forEach(a => a.btn.addEventListener("click", () => enviar(a.msg)));
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     try {
-      // 🔹 restaura sessão com dados corretos do backend
       const res = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -323,11 +312,10 @@ auth.onAuthStateChanged(async (user) => {
 
       const data = await res.json();
       currentUserId = data.user_id;
-
       setHeader(data);
       chatBox.innerHTML = "";
       addMsg("Hoper", `Olá, ${data.nome.split(" ")[0]}! Retomando nosso atendimento.`);
-      hoperImg.src = data.idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+      atualizarHoperPorHumor("");
       showAgent();
     } catch (e) {
       console.error("Erro ao restaurar sessão:", e);
@@ -335,4 +323,3 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
-
