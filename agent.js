@@ -151,9 +151,11 @@ btnRegister.addEventListener("click", async () => {
   }
 
   try {
+    // 🔹 Cria usuário no Firebase
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
+    // 🔹 Envia registro para o backend com UID do Firebase
     const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -162,7 +164,7 @@ btnRegister.addEventListener("click", async () => {
         email, 
         cep, 
         idade, 
-        uid: user.uid
+        uid: user.uid  // UID do Firebase
       })
     });
 
@@ -170,6 +172,7 @@ btnRegister.addEventListener("click", async () => {
     const data = await res.json();
     currentUserId = data.user_id;
 
+    // 🔹 Atualiza interface
     setHeader({ nome, email, cep, idade });
     chatBox.innerHTML = "";
     addMsg("Hoper", `Olá, ${nome.split(" ")[0]}! Estou aqui para ajudar. 👩‍⚕️`);
@@ -179,7 +182,6 @@ btnRegister.addEventListener("click", async () => {
   }
 });
 
-// ====================== LOGIN ======================
 // ====================== LOGIN ======================
 btnLogin.addEventListener("click", async () => {
   const email = loginEmail.value.trim();
@@ -195,12 +197,8 @@ btnLogin.addEventListener("click", async () => {
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // 🔹 Prepara dados para enviar ao backend
-    const payload = {};
-    if (user?.uid) payload.uid = user.uid;         // prioridade UID
-    else if (email) payload.email = email;        // fallback email
-
-    // 🔹 Busca dados corretos do backend via UID ou email
+    // 🔹 Envia UID para o backend para buscar dados
+    const payload = { uid: user.uid };
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -208,7 +206,6 @@ btnLogin.addEventListener("click", async () => {
     });
 
     if (!res.ok) throw new Error("Usuário não encontrado no backend.");
-
     const data = await res.json();
     currentUserId = data.user_id;
 
@@ -222,7 +219,7 @@ btnLogin.addEventListener("click", async () => {
     setHeader(safeData);
     chatBox.innerHTML = "";
     addMsg("Hoper", `Bem-vindo de volta, ${safeData.nome.split(" ")[0]}! Como posso ajudar hoje?`);
-    hoperImg.src = safeData.idade <= 17 ? "hoper_jovem_feliz.gif" : "hoper_adulto_feliz.gif";
+    atualizarHoperPorHumor("");
     showAgent();
   } catch (e) {
     alert(e.message || "Erro ao logar");
@@ -333,4 +330,5 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
+
 
