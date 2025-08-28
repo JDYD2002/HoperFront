@@ -149,18 +149,27 @@ btnRegister.addEventListener("click", async () => {
   }
 
   try {
+    // 🔹 Cria usuário no Firebase
     const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // 🔹 registra no backend e pega o user_id correto
+    // 🔹 Envia dados corretos pro backend (Cadastro)
     const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, email, idade, cep, uid: user.uid })
+      body: JSON.stringify({ 
+        nome, 
+        email, 
+        cep, 
+        idade, 
+        uid: user.uid // 🔹 UID do Firebase
+      })
     });
 
+    if (!res.ok) throw new Error("Falha ao registrar no backend.");
+
     const data = await res.json();
-    currentUserId = data.user_id;
+    currentUserId = data.user_id; // 🔹 Salva user_id correto
 
     setHeader({ nome, email, cep, idade });
     chatBox.innerHTML = "";
@@ -182,15 +191,18 @@ btnLogin.addEventListener("click", async () => {
   }
 
   try {
+    // 🔹 Login no Firebase
     const userCredential = await signInWithEmailAndPassword(auth, email, senha);
     const user = userCredential.user;
 
-    // 🔹 busca dados corretos do backend
+    // 🔹 Busca dados corretos do backend via UID
     const res = await fetch(`${BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: user.uid })
+      body: JSON.stringify({ uid: user.uid }) // 🔹 Envia apenas uid
     });
+
+    if (!res.ok) throw new Error("Usuário não encontrado no backend.");
 
     const data = await res.json();
     currentUserId = data.user_id;
@@ -211,6 +223,7 @@ btnLogin.addEventListener("click", async () => {
     alert(e.message || "Erro ao logar");
   }
 });
+
 
 // ====================== LOGOUT ======================
 btnLogout.addEventListener("click", async () => {
@@ -322,3 +335,4 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
+
