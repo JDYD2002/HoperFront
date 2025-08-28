@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const BASE_URL = "http://localhost:8000"; // ou sua URL de deploy
+const BASE_URL = "https://hoperbackk.onrender.com"; // ou sua URL de deploy
 
 // ====================== VARIÁVEIS ======================
 let currentUserId = null;
@@ -330,4 +330,5 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
+
 
