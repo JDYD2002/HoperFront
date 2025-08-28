@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const BASE_URL = "https://hoperbackk.onrender.com"; // ou sua URL de deploy
+const BASE_URL = "http://localhost:8000"; // ou sua URL de deploy
 
 // ====================== VARIÁVEIS ======================
 let currentUserId = null;
@@ -159,11 +159,11 @@ btnRegister.addEventListener("click", async () => {
     const res = await fetch(`${BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        nome, 
-        email, 
-        cep, 
-        idade, 
+      body: JSON.stringify({
+        nome,
+        email,
+        cep,
+        idade,
         uid: user.uid  // UID do Firebase
       })
     });
@@ -330,5 +330,4 @@ auth.onAuthStateChanged(async (user) => {
     }
   }
 });
-
 
