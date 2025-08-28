@@ -324,81 +324,52 @@ input:focus{ border-color: #3b82f6aa; box-shadow: 0 0 0 3px #3b82f622; }
   box-sizing: border-box;
 
 /* --- Ajustes responsivos globais --- */
+/* Ajustes responsivos */
+@media (max-width: 1200px) {
+  .agent-layout {
+    grid-template-columns: 350px 1fr; /* reduz levemente Hoper em telas médias */
+    gap: 20px;
+  }
+  .hoper-pane img {
+    max-width: 350px;
+  }
+  .chat {
+    height: 450px;
+  }
+}
+
 @media (max-width: 900px) {
   .agent-layout {
-    grid-template-columns: 1fr;  /* vira 1 coluna */
-    gap: 12px;
+    grid-template-columns: 1fr; /* empilha Hoper + chat */
+    gap: 16px;
   }
-
   .hoper-pane {
     align-items: center;
     justify-content: center;
     text-align: center;
   }
-
   .hoper-pane img {
-    width: 100%;
-    max-width: 260px; /* reduz imagem */
+    max-width: 260px;
   }
-
   .chat {
-    height: 360px; /* menor altura em telas menores */
+    height: 360px;
   }
 }
 
-/* Tablets e celulares */
 @media (max-width: 600px) {
-  body {
-    padding: 0 10px;
-    overflow-y: auto; /* permite rolagem */
-  }
-
-  #loginCard,
-  #registerCard {
-    width: 100%;
-    max-width: 100%;   /* ocupa toda largura */
-    margin: 10px auto;
-    height: auto;      /* altura flexível */
-    padding: 12px;
-  }
-
-  .tabs {
-    max-width: 100%;
-    gap: 4px;
-  }
-
-  .tab-btn {
-    padding: 6px;
-    font-size: 0.85rem;
-  }
-
   .chat {
-    height: 280px; /* ainda menor em celulares */
+    height: 280px;
   }
-
-  .msg .bubble {
-    max-width: 85%; /* evita bolha gigante em celular */
+  .hoper-pane img {
+    max-width: 200px;
   }
 }
 
-/* Celulares bem pequenos (<= 400px) */
 @media (max-width: 400px) {
-  .title {
-    font-size: 1.3rem;
-    text-align: center;
+  .chat {
+    height: 240px;
   }
-
-  input {
-    padding: 10px;
-    font-size: 0.85rem;
-  }
-
-  .btn {
-    padding: 10px;
-    font-size: 0.85rem;
-  }
-
-  .composer {
-    grid-template-columns: 1fr; /* input e botão ficam um abaixo do outro */
+  .hoper-pane img {
+    max-width: 180px;
   }
 }
